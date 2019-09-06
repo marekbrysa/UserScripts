@@ -26,7 +26,7 @@
 
   function addButton() {
     var nav;
-    if ((nav = document.querySelector('.file-navigation'))) {
+    if ((nav = document.querySelector('#commits_bucket'))) {
 
       // Check if our group of buttons are already attached.
       // Remove it, as the 'old' buttons don't have events anymore.
@@ -107,11 +107,14 @@
 
       const g = document.createElement('div');
       g.id = 'GitHubCommitCompareGroup';
-      g.classList.add('float-right');
-      g.appendChild(l);
-      g.appendChild(a);
+      g.setAttributeNS(null, 'style', 'text-align: right;');
+      const f = document.createElement('div');
+      f.setAttributeNS(null, 'style', 'display: inline-block;');
+      g.appendChild(f);
+      f.appendChild(l);
+      f.appendChild(a);
 
-      nav.appendChild(g);
+      nav.prepend(g);
     }
   }
 
@@ -150,8 +153,8 @@
     const hashB = compareB.parentNode.parentNode.parentNode.querySelector('clipboard-copy').value;
 
     const a = document.getElementById('GitHubCommitCompareButton');
-    a.setAttribute('href', `${repo}/compare/${hashA}...${hashB}`);
-    a.querySelector('span').textContent = ` ${hashA.substring(0, 7)}...${hashB.substring(0, 7)}`;
+    a.setAttribute('href', `${repo}/files/${hashB}..${hashA}`);
+    a.querySelector('span').textContent = ` ${hashB.substring(0, 7)}...${hashA.substring(0, 7)}`;
 
     //localStorage.setItem('GitHubCommitCompareButtonHashA', hashA);
     //localStorage.setItem('GitHubCommitCompareButtonHashB', hashB);
@@ -223,3 +226,4 @@
   document.addEventListener('pjax:end', addButton);
 
 })();
+

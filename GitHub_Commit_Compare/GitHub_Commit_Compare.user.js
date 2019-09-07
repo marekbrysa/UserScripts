@@ -192,8 +192,6 @@
       if (i === commits.length - 1 || commits[i+1].stackId) {
         const href = rangeHref(hashBase, commit.sha);
         $(stackTitleA).after(`<a class="GitHubCommitCompareToggle" href="${href}"> (stack)</a>`);
-        console.log($(stackTitleA).text());
-        console.log(href);
         hashBase = commit.sha;
         if (i<commits.length -1) {
           stackTitleA = commits[i+1].titleA;

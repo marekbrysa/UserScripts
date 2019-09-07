@@ -20,6 +20,7 @@
 // @exclude     https://github.com/*/*.patch
 // @version     0.0.3
 // @grant       none
+// @require    https://code.jquery.com/jquery-3.4.1.slim.js#sha256=0539537503bdfdf6ac701d5dade92b0d591a29df4f93007298c9473a21bea8b2
 // ==/UserScript==
 
 (function () {
@@ -48,15 +49,11 @@
             if (compareRadioGroup.length === 0) {
               addCompareRadios();
             } else {
-              Array.from(compareRadioGroup).forEach(function (b) {
-                b.classList.remove('d-none');
-              });
+              $('.GitHubCommitCompareToggle').show();
             }
           } else {
             // hide radios
-            Array.from(compareRadioGroup).forEach(function (b) {
-              b.classList.add('d-none');
-            });
+            $('.GitHubCommitCompareToggle').hide();
           }
           const compareButton = document.getElementById('GitHubCommitCompareButton');
           if (compareButton) compareButton.classList.remove('disabled');
@@ -152,14 +149,29 @@
     const compareA = document.querySelector('.GitHubCommitCompareButtonAB [name="GitHubCommitCompareButtonA"]:checked');
     const hashA = compareA.parentNode.parentNode.parentNode.querySelector('clipboard-copy').value;
     const compareB = document.querySelector('.GitHubCommitCompareButtonAB [name="GitHubCommitCompareButtonB"]:checked');
-    const hashB = compareB.parentNode.parentNode.parentNode.querySelector('clipboard-copy').value;
+    const clipboardCopyB = compareB.parentNode.parentNode.parentNode.querySelector('clipboard-copy');
+    const hashB = clipboardCopyB == null ? null : clipboardCopyB.value;
 
     const a = document.getElementById('GitHubCommitCompareButton');
-    a.setAttribute('href', `${repo}/files/${hashB}..${hashA}`);
-    a.querySelector('span').textContent = ` ${hashB.substring(0, 7)}..${hashA.substring(0, 7)}`;
+    const href = `${repo}/files/` + (hashB ? `${hashB}..` : '') + hashA;
+    a.setAttribute('href', href);
+    a.querySelector('span').textContent = `${hashB ? hashB.substring(0, 7) : 'base'}..${hashA.substring(0, 7)}`;
   }
 
   function addCompareRadios() {
+    $('#commits_bucket .commits-listing').prepend(
+    `<ol class="commit-group table-list table-list-bordered GitHubCommitCompareToggle">
+    <li class="commit commits-list-item table-list-item">
+        <div class="table-list-cell">
+            <p class="commit-title h5 mb-1 text-gray-dark ">
+                base
+            </p>
+        </div>
+        <div class="commit-links-cell table-list-cell">
+        </div>
+    </li>
+</ol>`);
+
     const commits = document.querySelectorAll('.commits-list-item .commit-links-cell');
     Array.from(commits).forEach(function (item, index) {
       const radioA = document.createElement('input');
@@ -185,15 +197,16 @@
       labelB.appendChild(radioB);
 
       const compareRadioGroup = document.createElement('div');
-      compareRadioGroup.classList.add('GitHubCommitCompareButtonAB', 'commit-links-group', 'BtnGroup');
+      compareRadioGroup.classList.add('GitHubCommitCompareButtonAB', 'commit-links-group', 'BtnGroup', 'GitHubCommitCompareToggle');
       compareRadioGroup.appendChild(labelB);
       compareRadioGroup.appendChild(labelA);
 
-      if (item.querySelector('.muted-link')) { // Insert after number of comments button.
+      /*if (item.querySelector('.muted-link')) { // Insert after number of comments button.
         item.insertBefore(compareRadioGroup, item.querySelector('.muted-link').nextSibling);
       } else {
         item.insertBefore(compareRadioGroup, item.firstChild);
-      }
+      }*/
+      item.appendChild(compareRadioGroup)
     });
 
     updateRadioButtons(); // Update radio buttons.

@@ -30,40 +30,42 @@
 
       // Check if our group of buttons are already attached.
       // Remove it, as the 'old' buttons don't have events anymore.
-      const e = document.getElementById('GitHubCommitCompareGroup');
-      if (e) {
-        e.parentElement.removeChild(e);
+      const oldCompareGroup = document.getElementById('GitHubCommitCompareGroup');
+      if (oldCompareGroup) {
+        oldCompareGroup.parentElement.removeChild(oldCompareGroup);
       }
-      Array.from(document.querySelectorAll('.GitHubCommitCompareButtonAB')).forEach(function (b) {
-        b.parentElement.removeChild(b);
+      Array.from(document.querySelectorAll('.GitHubCommitCompareButtonAB')).forEach(function (oldCompareRadioGroup) {
+        oldCompareRadioGroup.parentElement.removeChild(oldCompareRadioGroup);
       });
 
-      const c = document.createElement('input');
-      c.type = 'checkbox';
-      c.addEventListener('change',
+      const checkboxEnable = document.createElement('input');
+      checkboxEnable.type = 'checkbox';
+      checkboxEnable.addEventListener('change',
         function () {
-          const bb = document.querySelectorAll('.GitHubCommitCompareButtonAB');
+          const compareRadioGroup = document.querySelectorAll('.GitHubCommitCompareButtonAB');
           if (this.checked) {
-            if (bb.length === 0) {
-              addCompareButtons();
+            // add or show radios
+            if (compareRadioGroup.length === 0) {
+              addCompareRadios();
             } else {
-              Array.from(bb).forEach(function (b) {
+              Array.from(compareRadioGroup).forEach(function (b) {
                 b.classList.remove('d-none');
               });
             }
           } else {
-            Array.from(bb).forEach(function (b) {
+            // hide radios
+            Array.from(compareRadioGroup).forEach(function (b) {
               b.classList.add('d-none');
             });
           }
-          const bbb = document.getElementById('GitHubCommitCompareButton');
-          if (bbb) bbb.classList.remove('disabled');
+          const compareButton = document.getElementById('GitHubCommitCompareButton');
+          if (compareButton) compareButton.classList.remove('disabled');
         });
 
-      const l = document.createElement('label');
-      l.classList.add('tooltipped', 'tooltipped-n');
-      l.setAttribute('aria-label', 'Show commit compare buttons');
-      l.style.cssText = `
+      const label = document.createElement('label');
+      label.classList.add('tooltipped', 'tooltipped-n');
+      label.setAttribute('aria-label', 'Show commit compare buttons');
+      label.style.cssText = `
         float: left;
         padding: 3px 10px;
         font-size: 12px;
@@ -77,50 +79,50 @@
         border-top-left-radius: 3px;
         border-bottom-left-radius: 3px;
       `;
-      l.appendChild(c);
+      label.appendChild(checkboxEnable);
 
-      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      p.setAttributeNS(null,
+      const iconSvgPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      iconSvgPath.setAttributeNS(null,
         'd',
         'M5 12H4c-.27-.02-.48-.11-.69-.31-.21-.2-.3-.42-.31-.69V4.72A1.993 1.993 0 0 0 2 1a1.993 1.993 0 0 0-1 3.72V11c.03.78.34 1.47.94 2.06.6.59 1.28.91 2.06.94h1v2l3-3-3-3v2zM2 1.8c.66 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2C1.35 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2zm11 9.48V5c-.03-.78-.34-1.47-.94-2.06-.6-.59-1.28-.91-2.06-.94H9V0L6 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 12 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z');
 
-      const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      s.classList.add('octicon', 'octicon-diff');
-      s.setAttributeNS(null, 'height', 16);
-      s.setAttributeNS(null, 'width', 14);
-      s.setAttributeNS(null, 'viewBox', '0 0 14 16');
-      s.appendChild(p);
+      const iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      iconSvg.classList.add('octicon', 'octicon-diff');
+      iconSvg.setAttributeNS(null, 'height', 16);
+      iconSvg.setAttributeNS(null, 'width', 14);
+      iconSvg.setAttributeNS(null, 'viewBox', '0 0 14 16');
+      iconSvg.appendChild(iconSvgPath);
 
-      const a = document.createElement('a');
-      a.id = 'GitHubCommitCompareButton';
-      a.classList.add('btn', 'btn-sm', 'tooltipped', 'tooltipped-n', 'disabled');
-      a.setAttribute('href', '#');
-      a.setAttribute('rel', 'nofollow');
-      a.setAttribute('aria-label', 'Compare these commits');
-      a.style.cssText = `
+      const compareButton = document.createElement('a');
+      compareButton.id = 'GitHubCommitCompareButton';
+      compareButton.classList.add('btn', 'btn-sm', 'tooltipped', 'tooltipped-n', 'disabled');
+      compareButton.setAttribute('href', '#');
+      compareButton.setAttribute('rel', 'nofollow');
+      compareButton.setAttribute('aria-label', 'Compare these commits');
+      compareButton.style.cssText = `
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
         font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
       `;
-      a.appendChild(s);
-      a.appendChild(document.createElement("span"));
+      compareButton.appendChild(iconSvg);
+      compareButton.appendChild(document.createElement("span"));
 
-      const g = document.createElement('div');
-      g.id = 'GitHubCommitCompareGroup';
-      g.setAttributeNS(null, 'style', 'text-align: right;');
-      const f = document.createElement('div');
-      f.setAttributeNS(null, 'style', 'display: inline-block;');
-      g.appendChild(f);
-      f.appendChild(l);
-      f.appendChild(a);
+      const compareGroup = document.createElement('div');
+      compareGroup.id = 'GitHubCommitCompareGroup';
+      compareGroup.setAttributeNS(null, 'style', 'text-align: right;');
+      const compareGroupContainer = document.createElement('div');
+      compareGroupContainer.setAttributeNS(null, 'style', 'display: inline-block;');
+      compareGroup.appendChild(compareGroupContainer);
+      compareGroupContainer.appendChild(label);
+      compareGroupContainer.appendChild(compareButton);
 
-      nav.prepend(g);
+      nav.prepend(compareGroup);
     }
   }
 
   function updateRadioButtons() {
-    var compareAdisabled = true;
-    var compareBdisabled = false;
+    let compareAdisabled = true;
+    let compareBdisabled = false;
 
     const compares = document.querySelectorAll('.GitHubCommitCompareButtonAB');
     Array.from(compares).forEach(function (compare) {
@@ -154,65 +156,43 @@
 
     const a = document.getElementById('GitHubCommitCompareButton');
     a.setAttribute('href', `${repo}/files/${hashB}..${hashA}`);
-    a.querySelector('span').textContent = ` ${hashB.substring(0, 7)}...${hashA.substring(0, 7)}`;
-
-    //localStorage.setItem('GitHubCommitCompareButtonHashA', hashA);
-    //localStorage.setItem('GitHubCommitCompareButtonHashB', hashB);
+    a.querySelector('span').textContent = ` ${hashB.substring(0, 7)}..${hashA.substring(0, 7)}`;
   }
 
-  function addCompareButtons() {
+  function addCompareRadios() {
     const commits = document.querySelectorAll('.commits-list-item .commit-links-cell');
     Array.from(commits).forEach(function (item, index) {
-      const c1 = document.createElement('input');
-      c1.name = 'GitHubCommitCompareButtonA';
-      c1.type = 'radio';
-      c1.addEventListener('change', updateRadioButtons);
-      if (index === 1) c1.checked = true;
+      const radioA = document.createElement('input');
+      radioA.name = 'GitHubCommitCompareButtonA';
+      radioA.type = 'radio';
+      radioA.addEventListener('change', updateRadioButtons);
+      if (index === 1) radioA.checked = true;
 
-      const l1 = document.createElement('label');
-      l1.classList.add('btn', 'btn-outline', 'BtnGroup-item', 'tooltipped', 'tooltipped-s');
-      l1.setAttribute('aria-label', 'Choose a base commit');
-      l1.appendChild(c1);
+      const labelA = document.createElement('label');
+      labelA.classList.add('btn', 'btn-outline', 'BtnGroup-item', 'tooltipped', 'tooltipped-s');
+      labelA.setAttribute('aria-label', 'Choose a head commit');
+      labelA.appendChild(radioA);
 
-      const c2 = document.createElement('input');
-      c2.name = 'GitHubCommitCompareButtonB';
-      c2.type = 'radio';
-      c2.addEventListener('change', updateRadioButtons);
-      if (index === 0) c2.checked = true;
+      const radioB = document.createElement('input');
+      radioB.name = 'GitHubCommitCompareButtonB';
+      radioB.type = 'radio';
+      radioB.addEventListener('change', updateRadioButtons);
+      if (index === 0) radioB.checked = true;
 
-      const l2 = document.createElement('label');
-      l2.classList.add('btn', 'btn-outline', 'BtnGroup-item', 'tooltipped', 'tooltipped-s');
-      l2.setAttribute('aria-label', 'Choose a head commit');
-      l2.appendChild(c2);
+      const labelB = document.createElement('label');
+      labelB.classList.add('btn', 'btn-outline', 'BtnGroup-item', 'tooltipped', 'tooltipped-s');
+      labelB.setAttribute('aria-label', 'Choose a base commit');
+      labelB.appendChild(radioB);
 
-      // const p3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      // p3.setAttributeNS(null,
-      //'d',
-      //'M5 12H4c-.27-.02-.48-.11-.69-.31-.21-.2-.3-.42-.31-.69V4.72A1.993 1.993 0 0 0 2 1a1.993 1.993 0 0 0-1 3.72V11c.03.78.34 1.47.94 2.06.6.59 1.28.91 2.06.94h1v2l3-3-3-3v2zM2 1.8c.66 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2C1.35 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2zm11 9.48V5c-.03-.78-.34-1.47-.94-2.06-.6-.59-1.28-.91-2.06-.94H9V0L6 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 12 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z');
+      const compareRadioGroup = document.createElement('div');
+      compareRadioGroup.classList.add('GitHubCommitCompareButtonAB', 'commit-links-group', 'BtnGroup');
+      compareRadioGroup.appendChild(labelB);
+      compareRadioGroup.appendChild(labelA);
 
-      // const s3 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      // s3.classList.add('octicon', 'octicon-diff');
-      // s3.setAttributeNS(null, 'height', 16);
-      // s3.setAttributeNS(null, 'width', 14);
-      // s3.setAttributeNS(null, 'viewBox', '0 0 14 16');
-      // s3.appendChild(p3);
-
-      // const l3 = document.createElement('a');
-      // l3.classList.add('btn', 'btn-outline', 'BtnGroup-item', 'tooltipped', 'tooltipped-sw');
-      // l3.setAttribute('aria-label', 'TODO');
-      // l3.appendChild(s3);
-
-      const gg = document.createElement('div');
-      gg.classList.add('GitHubCommitCompareButtonAB', 'commit-links-group', 'BtnGroup');
-      gg.appendChild(l1);
-      gg.appendChild(l2);
-      //gg.appendChild(l3);
-
-      //item.style.width = '350px';
       if (item.querySelector('.muted-link')) { // Insert after number of comments button.
-        item.insertBefore(gg, item.querySelector('.muted-link').nextSibling);
+        item.insertBefore(compareRadioGroup, item.querySelector('.muted-link').nextSibling);
       } else {
-        item.insertBefore(gg, item.firstChild);
+        item.insertBefore(compareRadioGroup, item.firstChild);
       }
     });
 

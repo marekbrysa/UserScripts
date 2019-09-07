@@ -43,21 +43,8 @@
       checkboxEnable.type = 'checkbox';
       checkboxEnable.addEventListener('change',
         function () {
-          const compareRadioGroup = document.querySelectorAll('.GitHubCommitCompareButtonAB');
-          if (this.checked) {
-            // add or show radios
-            if (compareRadioGroup.length === 0) {
-              addCompareRadios();
-            } else {
-              $('.GitHubCommitCompareToggle').show();
-            }
-          } else {
-            // hide radios
-            $('.GitHubCommitCompareToggle').hide();
-          }
-          const compareButton = document.getElementById('GitHubCommitCompareButton');
-          if (compareButton) compareButton.classList.remove('disabled');
-        });
+        toggleVisibility(this.checked);
+      });
 
       const label = document.createElement('label');
       label.classList.add('tooltipped', 'tooltipped-n');
@@ -117,6 +104,24 @@
     }
   }
 
+  function toggleVisibility(visible) {
+    if (visible) {
+      const compareRadioGroup = document.querySelectorAll('.GitHubCommitCompareButtonAB');
+      // add or show things
+      if (compareRadioGroup.length === 0) {
+        addCompareRadios();
+        addStackLinks();
+      } else {
+        $('.GitHubCommitCompareToggle').show();
+      }
+    } else {
+      // hide things
+      $('.GitHubCommitCompareToggle').hide();
+    }
+    const compareButton = document.getElementById('GitHubCommitCompareButton');
+    if (compareButton) compareButton.classList.remove('disabled');
+  }
+
   function updateRadioButtons() {
     let compareAdisabled = true;
     let compareBdisabled = false;
@@ -143,9 +148,12 @@
     updateCompareButton();
   }
 
-  function updateCompareButton() {
+  function rangeHref(hashBase, hashHead) {
     const repo = document.querySelector('meta[property="og:url"]').content;
+    return `${repo}/files/` + (hashBase ? `${hashBase}..` : '') + hashHead;
+  }
 
+  function updateCompareButton() {
     const compareA = document.querySelector('.GitHubCommitCompareButtonAB [name="GitHubCommitCompareButtonA"]:checked');
     const hashA = compareA.parentNode.parentNode.parentNode.querySelector('clipboard-copy').value;
     const compareB = document.querySelector('.GitHubCommitCompareButtonAB [name="GitHubCommitCompareButtonB"]:checked');
@@ -153,9 +161,45 @@
     const hashB = clipboardCopyB == null ? null : clipboardCopyB.value;
 
     const a = document.getElementById('GitHubCommitCompareButton');
-    const href = `${repo}/files/` + (hashB ? `${hashB}..` : '') + hashA;
+    const href = rangeHref(hashB, hashA);
     a.setAttribute('href', href);
     a.querySelector('span').textContent = `${hashB ? hashB.substring(0, 7) : 'base'}..${hashA.substring(0, 7)}`;
+  }
+
+  function addStackLinks() {
+    const commits = [];
+    $('#commits_bucket .commits-list-item .commit-title>a').each((index, commitTitleA) => {
+      const title = $(commitTitleA).text();
+
+      const stackMatch = /^(\d+):.*$/.exec(title);
+      const stackId = stackMatch ? stackMatch[1] : null;
+
+      const hrefSplit = $(commitTitleA).prop("href").split("/");
+      const sha = hrefSplit[hrefSplit.length - 1];
+
+      commits.push({
+        title: title,
+        sha: sha,
+        stackId: stackId,
+        titleA: commitTitleA
+      });
+    });
+
+    let hashBase = null;
+    let stackTitleA = commits[0].titleA;
+    for (let i =0; i<commits.length; i++) {
+      const commit = commits[i];
+      if (i === commits.length - 1 || commits[i+1].stackId) {
+        const href = rangeHref(hashBase, commit.sha);
+        $(stackTitleA).after(`<a class="GitHubCommitCompareToggle" href="${href}"> (stack)</a>`);
+        console.log($(stackTitleA).text());
+        console.log(href);
+        hashBase = commit.sha;
+        if (i<commits.length -1) {
+          stackTitleA = commits[i+1].titleA;
+        }
+      }
+    }
   }
 
   function addCompareRadios() {

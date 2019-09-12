@@ -201,18 +201,21 @@
   }
 
   function addCompareRadios() {
-    $('#commits_bucket .commits-listing').prepend(
-    `<ol class="commit-group table-list table-list-bordered GitHubCommitCompareToggle">
-    <li class="commit commits-list-item table-list-item">
-        <div class="table-list-cell">
-            <p class="commit-title h5 mb-1 text-gray-dark ">
-                base
-            </p>
-        </div>
-        <div class="commit-links-cell table-list-cell">
-        </div>
-    </li>
-</ol>`);
+    if ($("#GitHubCommitCompareBaseCommit").length === 0) {
+      $('#commits_bucket .commits-listing').prepend(
+        `<ol id="GitHubCommitCompareBaseCommit" class="commit-group table-list table-list-bordered GitHubCommitCompareToggle">
+            <li class="commit commits-list-item table-list-item">
+                <div class="table-list-cell">
+                    <p class="commit-title h5 mb-1 text-gray-dark ">
+                        base
+                    </p>
+                </div>
+                <div class="commit-links-cell table-list-cell">
+                </div>
+            </li>
+        </ol>`);
+    }
+
 
     const commits = document.querySelectorAll('.commits-list-item .commit-links-cell');
     Array.from(commits).forEach(function (item, index) {
